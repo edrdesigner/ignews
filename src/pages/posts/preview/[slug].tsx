@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { useSession } from 'next-auth/client';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ export default function PostPreview({ post }: PostPreviewProps) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!session?.activeSubscription) {
+    if (session?.activeSubscription) {
       router.push(`/posts/${post.slug}`);
     }
   }, [session]);
@@ -52,9 +52,14 @@ export default function PostPreview({ post }: PostPreviewProps) {
   );
 }
 
-export const getStaticPaths = () => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  // aqui voce poderia fazer uma chamada para os posts mais acessados
   return {
-    paths: [],
+    paths: [
+      // {
+      //   params: { slug: 'obtendo-o-status-de-progresso-do-envio-de-dados-com' },
+      // },
+    ],
     fallback: 'blocking',
   };
 };
@@ -81,5 +86,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: { post },
+    revalidate: 60 * 30,
   };
 };
